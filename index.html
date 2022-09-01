@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Firebase data</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-3">
+      <table class="table table-dark">
+        <thead>
+          <th>Number of Connection</th>
+          <th>Address</th>
+          <th>Balance</th>
+        </thead>
+        <tbody id="tbody1"></tbody>
+      </table>
+    </div>
+
+    <!-- JS Code  -->
+    <script type="module">
+      var connectionNum = 0;
+      var tbody = document.getElementById("tbody1");
+
+      function addDetailToTable(addr, blnc) {
+        let trow = document.createElement("tr");
+        let td1 = document.createElement("td");
+        let td2 = document.createElement("td");
+        let td3 = document.createElement("td");
+
+        td1.innerHTML = ++connectionNum;
+        td2.innerHTML = addr;
+        td3.innerHTML = blnc;
+
+        trow.appendChild(td1);
+        trow.appendChild(td2);
+        trow.appendChild(td3);
+
+        tbody.appendChild(trow);
+      }
+
+      function addAllDetailToTable(theConnection) {
+        console.log(theConnection);
+
+        // addDetailToTable("AddressOfUser", "blanceOfUser");
+
+        connectionNum = 0;
+        tbody.innerHTML = "";
+        theConnection.forEach((element) => {
+          addDetailToTable(element.addr, element.balance);
+        });
+      }
+
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyDIbFMsVfvlX4mUVRFOs9bHAQ0GYO-g7Ds",
+        authDomain: "wallet-7cb7e.firebaseapp.com",
+        databaseURL: "https://wallet-7cb7e-default-rtdb.firebaseio.com",
+        projectId: "wallet-7cb7e",
+        storageBucket: "wallet-7cb7e.appspot.com",
+        messagingSenderId: "835135691346",
+        appId: "1:835135691346:web:32cc57c45a6fd29f9d5d8b",
+      };
+      const app = initializeApp(firebaseConfig);
+
+      import {
+        getDatabase,
+        ref,
+        child,
+        onValue,
+        get,
+      } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-database.js";
+
+      const db = getDatabase();
+
+      // array area
+      function getAllDataOnce() {
+        const dbRef = ref(db);
+
+        get(child(dbRef, "wallet")).then((snapshot) => {
+          var connections = [];
+          snapshot.forEach((childSnapshot) => {
+            connections.push(childSnapshot.val());
+          });
+          addAllDetailToTable(connections);
+        });
+      }
+
+      function getDataRealtime() {
+        const dbRef = ref(db, "wallet");
+
+        onValue(dpRef, (snapshot) => {
+          var connections = [];
+          snapshot.forEach((childSnapshot) => {
+            connections.push(childSnapshot.val());
+          });
+          addAllDetailToTable(connections);
+        });
+      }
+
+      window.onload = getAllDataOnce;
+    </script>
+  </body>
+</html>
